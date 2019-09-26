@@ -1,7 +1,6 @@
 import React from "react";
 
 export default ({ layer, layers, setLayer }) => {
-  debugger;
   return (  
   <div className="flex">
     <select defaultValue={layer} onChange={(selectEvent) => {
