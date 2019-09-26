@@ -3,13 +3,13 @@ import ReactDOM from "react-dom";
 import L from "leaflet";
 import "leaflet-hash";
 import "leaflet-editable";
-import marker from "../map/marker";
 import Popup from "./popup";
 import geojsonRewind from "geojson-rewind";
 import simplestyle from "./simplestyle";
 import iconRetinaUrl from "../../css/marker-icon-2x.png";
 import iconUrl from "../../css/marker-icon.png";
 import shadowUrl from "../../css/marker-shadow.png";
+import {icon} from '../map/icon';
 
 const polygon = <path d="M15 6l8.56 6.219-3.27 10.062H9.71L6.44 12.22z" />;
 const line = <path d="M6 7l8.31 3.99v7.822l8.31 4.746" />;
@@ -18,16 +18,17 @@ const point = (
   <path d="M15 24.152L7 13.015c-.747-4.83 1.92-7.246 8-7.246s8.747 2.415 8 7.246l-8 11.137z" />
 );
 
-L.Marker.prototype.options.icon = new L.Icon({
-  iconUrl,
-  iconRetinaUrl,
-  shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
-});
+L.Marker.prototype.options.icon = 
+  new L.Icon({
+    iconUrl,
+    iconRetinaUrl,
+    shadowUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+  });
 
 export default class Map extends React.Component {
   constructor(props) {
@@ -208,6 +209,33 @@ export default class Map extends React.Component {
     const geojson = featuresLayer.toGeoJSON();
     featuresLayer.clearLayers();
     L.geoJson(geojson).eachLayer(layer => {
+      if (layer.feature.geometry.type === "Point") { //regen icon incase it has been edited
+        let props = layer.feature.properties;
+        if (props["marker-color"] || props["marker-size"]){
+          layer.setIcon(icon(props));
+        }
+      }
+      if (["LineString", "MultiLineString", "Polygon", "MultiPolygon"].indexOf(layer.feature.geometry.type) >= 0) { //regen icon incase it has been edited
+        let props = layer.feature.properties;
+        if (props["stroke"]){
+          layer.setStyle({color: props["stroke"]});
+        }
+        if (props["stroke-width"]){
+          layer.setStyle({width: props["stroke-width"]});
+        }
+        if (props["stroke-opacity"]){
+          layer.setStyle({opacity: props["stroke-opacity"]});
+        }
+        if (props["fill"]){
+          layer.setStyle({fill: props["fill"]});
+        }
+        if (props["fill-color"]){
+          layer.setStyle({fillColor: props["fill-color"]});
+        }
+        if (props["fille-opacity"]){
+          layer.setStyle({fillOpacity: props["fill-opacity"]});
+        }
+      }
       featuresLayer.addLayer(layer);
       // layer must be added before editing can be enabled.
       layer.enableEdit();
@@ -252,7 +280,8 @@ export default class Map extends React.Component {
         }
       } = this.state;
       featuresLayer.clearLayers();
-      L.geoJson(geojson).eachLayer(layer => {
+      L.geoJson(geojson).eachLayer(layer => {        
+        
         featuresLayer.addLayer(layer);
         // layer must be added before editing can be enabled.
         layer.enableEdit();

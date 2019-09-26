@@ -4,11 +4,11 @@ const buttons = [
   {
     mode: "code",
     title: "JSON"
-  } /*,
-  {
-    mode: "table",
-    title: "Table"
-  } */,
+  },
+  // {
+  //   mode: "table",
+  //   title: "Table"
+  // },
   {
     mode: "help",
     title: "Help"

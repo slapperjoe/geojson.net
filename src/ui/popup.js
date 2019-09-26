@@ -1,19 +1,25 @@
 import ReactJson from "react-json-view";
 import React from "react";
 import { geometry as geometryArea } from "@mapbox/geojson-area";
+import {icon} from '../map/icon';
+import NumericInput from 'react-numeric-input'
+import InputNumber from 'react-input-number'
 
 export default class Popup extends React.Component {
   state = {
-    tab: "properties"
+    tab: "display properties"
   };
   setTab = tab => {
     this.setState({ tab });
   };
   render() {
-    const tabs = ["properties", "statistics"];
+    const tabs = ["display properties", "other properties", "statistics"];
     const { tab } = this.state;
     const { layer, editProperties, popupRemoveLayer } = this.props;
     const { properties } = layer.toGeoJSON();
+    const otherProps = properties.filter ? properties.filter(a => {
+      return ["marker-color", "marker-size", "stroke", "stroke-width", "stroke-opacity", "fill", "fill-opacity"].indexOf(a) === -1;
+    }) : [];
     return (
       <div>
         <div className="bb flex fw6">
@@ -29,7 +35,7 @@ export default class Popup extends React.Component {
             </span>
           ))}
         </div>
-        {tab === "properties" ? (
+        {tab === "other properties" ? (
           <div className="pa2">
             <ReactJson
               name="properties"
@@ -38,11 +44,13 @@ export default class Popup extends React.Component {
               onAdd={editProperties}
               onDelete={editProperties}
               enableClipboard={false}
-              src={properties}
+              src={otherProps}
             />
           </div>
         ) : tab === "statistics" ? (
           <Metadata layer={layer} />
+        ) : tab === "display properties" ? (
+          <DisplayTable layer={layer} props={properties} />
         ) : null}
         <div className="bt flex fw6">
           <span
@@ -122,4 +130,152 @@ const Table = ({ obj }) => {
       </tbody>
     </table>
   );
+};
+
+const DisplayContent = ({layer, props}) => {
+  if (layer.feature && layer.feature.geometry){
+    if (layer.feature.geometry.type === 'Point' || layer.feature.geometry.type === 'MultiPoint') {
+      return (
+        <tbody>
+          <tr className="style-row">
+            <th>marker-color</th>
+            <td>
+              <input onChange={(event) => {
+                props["marker-color"] = event.currentTarget.value;
+                const newIcon = icon(props);
+                layer.setIcon(newIcon);
+                }} type="color" defaultValue="#2B82CB"></input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>marker-size</th>
+            <td>
+              <select value={props['marker-size'] ? props['marker-size'] : 'medium'} onChange={(event) => {
+                props["marker-size"] = event.currentTarget.value;
+                layer.setIcon(icon(props));
+              }}>
+                <option value="small">small</option>
+                <option value="medium">medium</option>
+                <option value="large">large</option>
+              </select>
+            </td>
+          </tr> 
+          <tr className="style-row">
+            <th>marker-symbol</th>
+            <td>
+              <input type="text" list="marker-symbol" value={props['marker-symbol']} />
+              <datalist id="marker-symbol"></datalist>
+            </td>
+          </tr>
+        </tbody>
+      );
+    }
+    if (layer.feature.geometry.type === 'LineString' || layer.feature.geometry.type === 'MultiLineString') {              
+      return (
+        <tbody>
+          <tr className="style-row">
+            <th>stroke</th>
+            <td>
+              <input type="color" defaultValue="#2B82CB"
+                onChange={(event) => {
+                  props["stroke"] = event.currentTarget.value;
+                  layer.setStyle({color: event.currentTarget.value});
+                }}>
+              </input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>stroke-width</th>
+            <td>
+              <input type="number" defaultValue="1" min="1" max="8"
+                onChange={()=> {
+                  props["stroke-width"] = event.target.value;
+                  layer.setStyle({weight: event.target.value});
+                }}
+              ></input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>stroke-opacity</th>
+            <td>
+              <input type="number" defaultValue="1" min="0" max="1" step="0.1"
+                onChange={()=> {
+                  props["stroke-opacity"] = event.target.value;
+                  layer.setStyle({opacity: event.target.value});
+                }}
+              ></input>
+            </td>
+          </tr>  
+        </tbody>
+      );
+    }
+    if (layer.feature.geometry.type === 'Polygon' || layer.feature.geometry.type === 'MultiPolygon') {              
+      return (
+        <tbody>
+          <tr className="style-row">
+            <th>stroke</th>
+            <td>
+              <input type="color" defaultValue="#2B82CB"
+                onChange={(event) => {
+                  props["stroke"] = event.currentTarget.value;
+                  layer.setStyle({color: event.currentTarget.value});
+                }}>
+              </input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>stroke-width</th>
+            <td>
+              <input type="number" defaultValue="1" min="1" max="8"
+                onChange={()=> {
+                  props["stroke-width"] = event.target.value;
+                  layer.setStyle({weight: event.target.value});
+                }}
+              ></input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>fill</th>
+            <td>
+              <input type="checkbox" defaultValue="false"
+                onChange={()=> {
+                  props["fill"] = event.target.value;
+                  layer.setStyle({fill: event.currentTarget.value});
+                }}
+              ></input>
+            </td>
+          </tr>  
+          <tr className="style-row">
+            <th>fill-color</th>
+            <td>
+              <input type="color" defaultValue="#2B82CB"
+                onChange={()=> {
+                  props["fill-color"] = event.currentTarget.value;
+                  layer.setStyle({fillColor: event.target.value});
+                }}
+              ></input>
+            </td>
+          </tr>
+          <tr className="style-row">
+            <th>fill-opacity</th>
+            <td>
+            <input type="number" defaultValue="0.2" min="0" max="1" step="0.1"
+                onChange={()=> {
+                  props["fill-opacity"] = event.target.value;
+                  layer.setStyle({fillOpacity: event.target.value});
+                }}
+              ></input>
+            </td>
+          </tr>      
+        </tbody>
+      );
+    }    
+  }
+  return null;
+};
+
+const DisplayTable = ({layer, props}) => {
+  return <table className="space-bottom0 marker-properties">
+    <DisplayContent layer={layer} props={props} />
+  </table>
 };

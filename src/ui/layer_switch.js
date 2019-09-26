@@ -1,17 +1,14 @@
 import React from "react";
 
-export default ({ layer, layers, setLayer }) => (
+export default ({ layer, layers, setLayer }) => {
+  debugger;
+  return (  
   <div className="flex">
-    {layers.map(({ id, title }) => (
-      <span
-        key={id}
-        onClick={() => setLayer(id)}
-        className={`db pointer bn pa2 nowrap outline-0 ${layer === id
-          ? "bg-yellow"
-          : ""}`}
-      >
-        {title}
-      </span>
-    ))}
+    <select defaultValue={layer} onChange={(selectEvent) => {
+      setLayer(selectEvent.currentTarget.value)}}>
+      {layers.map(({id, title}) => (
+        <option key={id} value={id}>{title}</option>
+      ))}
+    </select>
   </div>
-);
+)};

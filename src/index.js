@@ -19,6 +19,8 @@ import Dropzone from "react-dropzone";
 import magicFile from "./lib/magic_file";
 import mergeGeojson from "./lib/merge_geojson";
 import { layers } from "./layers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCaretRight, faCaretLeft } from "@fortawesome/free-solid-svg-icons"
 
 const client = new ApolloClient({
   link: createHttpLink({ uri: "/github/graphql", credentials: 'include' }),
@@ -38,7 +40,7 @@ class App extends React.Component {
     geojson: initialGeojson,
     changeFrom: undefined,
     dropzoneActive: false,
-    showPanel: true
+    showPanel: false
   };
   togglePanel = () => {
     this.setState(({ showPanel }) => ({
@@ -153,7 +155,7 @@ class App extends React.Component {
           <div className="f6 sans-serif fw6">
             <div className="vh-100 flex">
               <div
-                className={`w-${showPanel ? "50" : "100"} flex flex-column z-0`}
+                className={`w-${showPanel ? "75" : "100"} flex flex-column z-0`}
               >
                 <div className="bg-white flex justify-between bb">
                   <FileBar
@@ -186,12 +188,12 @@ class App extends React.Component {
                     Add layer
                   </div>
                   <span onClick={this.togglePanel}>
-                    {showPanel ? "▷" : "◁"}
+                    {showPanel ? <FontAwesomeIcon icon={faCaretRight}/> : <FontAwesomeIcon icon={faCaretLeft}/>}
                   </span>
                 </div>
               </div>
               {showPanel && (
-                <div className="w-50 bl flex flex-column">
+                <div className="w-25 bl flex flex-column">
                   <div
                     className="bg-white flex justify-between bb"
                     style={{
