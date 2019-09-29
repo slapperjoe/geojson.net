@@ -265,10 +265,7 @@ export default class Map extends React.Component {
   };
   componentDidUpdate(prevProps, prevState) {
     const { baseLayerGroup, map } = this.state;
-    const { showPanel, layer, geojson, changeFrom } = this.props;
-    if (prevProps.showPanel !== showPanel) {
-      map.invalidateSize();
-    }
+    const { layer, geojson, changeFrom } = this.props;
     if (layer !== prevProps.layer) {
       baseLayerGroup.clearLayers();
       this.props.layers.find(({ id }) => id === layer).layer.addTo(baseLayerGroup);

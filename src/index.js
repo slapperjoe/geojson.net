@@ -1,31 +1,13 @@
-import querystring from "querystring";
 import React from "react";
 import ReactDOM from "react-dom";
-import Help from "./panel/help";
 import LayerSwitch from "./ui/layer_switch";
 import FileBar from "./ui/file_bar";
-import ModeButtons from "./ui/mode_buttons";
-import User from "./ui/user";
 import Map from "./ui/map";
-import GithubModal from "./ui/github_modal";
-import GistModal from "./ui/gist_modal";
 import LayerModal from "./ui/layer_modal";
-import Panel from "./panel/index";
-import ApolloClient from "apollo-client";
-import { createHttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider } from "react-apollo";
 import Dropzone from "react-dropzone";
 import magicFile from "./lib/magic_file";
 import mergeGeojson from "./lib/merge_geojson";
 import { layers } from "./layers";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCaretRight, faCaretLeft } from "@fortawesome/free-solid-svg-icons"
-
-const client = new ApolloClient({
-  link: createHttpLink({ uri: "https://api.github.com/graphql", credentials: 'include' }),
-  cache: new InMemoryCache().restore(window.__APOLLO_STATE__)
-});
 
 const initialGeojson = { type: "FeatureCollection", features: [] };
 
@@ -34,31 +16,13 @@ class App extends React.Component {
     mode: "code",
     layer: "mapbox",
     layers: layers,
-    githubModal: false,
-    gistModal: false,
     layerModal: false,
     geojson: initialGeojson,
     changeFrom: undefined,
-    dropzoneActive: false,
-    showPanel: false
-  };
-  togglePanel = () => {
-    this.setState(({ showPanel }) => ({
-      showPanel: !showPanel
-    }));
+    dropzoneActive: false
   };
   setMode = mode => {
     this.setState({ mode });
-  };
-  toggleGithubModal = () => {
-    this.setState(({ githubModal }) => ({
-      githubModal: !githubModal
-    }));
-  };
-  toggleGistModal = () => {
-    this.setState(({ gistModal }) => ({
-      gistModal: !gistModal
-    }));
   };
   toggleLayerModal = () => {
     this.setState(({ layerModal }) => ({
@@ -134,17 +98,13 @@ class App extends React.Component {
       layers,
       map,
       mode,
-      githubModal,
-      gistModal,
       layerModal,
       accept,
       files,
-      dropzoneActive,
-      showPanel
+      dropzoneActive
     } = this.state;
     const { setGeojson, setLayer, setMode, togglePanel } = this;
     return (
-      <ApolloProvider client={client}>
         <Dropzone
           disableClick
           style={{ position: "relative" }}
@@ -155,15 +115,13 @@ class App extends React.Component {
           <div className="f6 sans-serif fw6">
             <div className="vh-100 flex">
               <div
-                className={`w-${showPanel ? "75" : "100"} flex flex-column z-0`}
+                className={`w-100 flex flex-column z-0`}
               >
                 <div className="bg-white flex justify-between bb">
                   <FileBar
                     geojson={geojson}
                     geojsonObject={geojsonObject}
                     setGeojson={setGeojson}
-                    toggleGithubModal={this.toggleGithubModal}
-                    toggleGistModal={this.toggleGistModal}
                     toggleConfigModal={this.toggleConfigModal}
                   />
                 </div>
@@ -173,7 +131,6 @@ class App extends React.Component {
                   geojson={geojson}
                   setGeojson={setGeojson}
                   changeFrom={changeFrom}
-                  showPanel={showPanel}
                 />
                 <div className="flex justify-between bt">
                   <LayerSwitch
@@ -187,34 +144,8 @@ class App extends React.Component {
                   >
                     Add layer
                   </div>
-                  <span onClick={this.togglePanel}>
-                    {showPanel ? <FontAwesomeIcon icon={faCaretRight}/> : <FontAwesomeIcon icon={faCaretLeft}/>}
-                  </span>
                 </div>
               </div>
-              {showPanel && (
-                <div className="w-25 bl flex flex-column">
-                  <div
-                    className="bg-white flex justify-between bb"
-                    style={{
-                      flexShrink: 0
-                    }}
-                  >
-                    <ModeButtons mode={mode} setMode={setMode} />
-                    <User />
-                  </div>
-                  <Panel
-                    mode={mode}
-                    geojson={geojson}
-                    setGeojson={setGeojson}
-                    changeFrom={changeFrom}
-                  />
-                </div>
-              )}
-              {githubModal && (
-                <GithubModal toggleGithubModal={this.toggleGithubModal} setGeojson={setGeojson} />
-              )}
-              {gistModal && <GistModal />}
               {layerModal && (
                 <LayerModal
                   onCancel={this.toggleLayerModal}
@@ -236,7 +167,6 @@ class App extends React.Component {
             </div>
           )}
         </Dropzone>
-      </ApolloProvider>
     );
   }
 }

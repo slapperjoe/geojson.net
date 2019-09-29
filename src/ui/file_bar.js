@@ -5,7 +5,7 @@ import wkx from "wkx";
 import geojson2dsv from "geojson2dsv";
 import togpx from "togpx";
 import polyline from "@mapbox/polyline";
-import topojson from "topojson";
+import topojson from "topojson-simplify";
 import { saveAs } from "file-saver";
 import tokml from "tokml";
 import geojsonNormalize from "@mapbox/geojson-normalize";
@@ -13,7 +13,7 @@ import simplify from "@turf/simplify";
 import wellknown from "wellknown";
 import magicFile from "../lib/magic_file";
 import geojsonRandom from "geojson-random";
-import geojsonExtent from "geojson-extent";
+import geojsonExtent from "@mapbox/extent";
 import geojsonFlatten from "geojson-flatten";
 import mergeGeojson from "../lib/merge_geojson";
 
