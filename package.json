@@ -54,6 +54,7 @@
     "react-dropzone": "^4.2.10",
     "react-input-number": "^5.0.18",
     "react-json-view": "^1.19.1",
+    "react-map-gl": "^5.0.11",
     "react-numeric-input": "^2.2.3",
     "sanitize-caja": "^0.1.4",
     "shp-write": "0.3.2",
