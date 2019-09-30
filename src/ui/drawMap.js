@@ -53,7 +53,7 @@ export default class DrawMap extends React.Component {
         </div>
 
         <div className="draw" style={drawStyle}>
-          <BaseControl  />
+          <BaseControl />
         </div>
 
       </ReactMapGL>
