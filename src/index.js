@@ -8,29 +8,18 @@ import Dropzone from "react-dropzone";
 import magicFile from "./lib/magic_file";
 import mergeGeojson from "./lib/merge_geojson";
 import { layers } from "./layers";
-import ReactMapGL from "react-map-gl";
+import DrawMap from "./ui/drawMap";
 
 const initialGeojson = { type: "FeatureCollection", features: [] };
 
 class App extends React.Component {
   state = {
-    mode: "code",
     layer: "mapbox",
     layers: layers,
     layerModal: false,
     geojson: initialGeojson,
     changeFrom: undefined,
-    dropzoneActive: false,
-    viewport: {
-      width: 400,
-      height: 400,
-      latitude: 37.7577,
-      longitude: -122.4376,
-      zoom: 8
-    }
-  };
-  setMode = mode => {
-    this.setState({ mode });
+    dropzoneActive: false
   };
   toggleLayerModal = () => {
     this.setState(({ layerModal }) => ({
@@ -105,13 +94,13 @@ class App extends React.Component {
       layer,
       layers,
       map,
-      mode,
       layerModal,
       accept,
       files,
       dropzoneActive
     } = this.state;
-    const { setGeojson, setLayer, setMode, togglePanel } = this;
+    const { setGeojson, setLayer  } = this;
+    
     return (
         <Dropzone
           disableClick
@@ -133,11 +122,7 @@ class App extends React.Component {
                     toggleConfigModal={this.toggleConfigModal}
                   />
                 </div>
-                <ReactMapGL 
-                  {...this.state.viewport}
-                  onViewportChange={(viewport) => this.setState({viewport})}
-                  mapboxApiAccessToken={"pk.eyJ1IjoibWFyaWMxIiwiYSI6Ii0xdWs1TlUifQ.U56tiQG_kj88zNf_1PxHQw"}
-                />
+                <DrawMap />
                 <Map
                   layer={layer}
                   layers={layers}
